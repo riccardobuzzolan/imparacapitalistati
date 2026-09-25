@@ -280,6 +280,23 @@ main {
   color: #6c797e;
   font-size: 11px;
 }
+.progress-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 .reset {
   height: 36px;
   border: 1px solid var(--line);
@@ -634,6 +651,13 @@ main {
   }
 }
 @media (max-width: 420px) {
+  .badge-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .progress-actions {
+    justify-content: flex-start;
+  }
   .region-tabs button {
     font-size: 10px;
   }

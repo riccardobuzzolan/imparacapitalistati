@@ -1,15 +1,30 @@
 # Memory Atlas
 
-Sito statico. Nessuna build e nessuna dipendenza.
+Quiz sulle capitali di Stati Uniti, Europa e Sud America. Il progetto usa Vite,
+TypeScript e una PWA installabile. I progressi restano nel browser e possono
+essere esportati o importati come file JSON.
 
-## Pubblicazione su GitHub Pages
+## Sviluppo
 
-1. Carica tutti i file di questa cartella nella root del repository.
-2. Apri **Settings → Pages**.
-3. In **Build and deployment** scegli **Deploy from a branch**.
-4. Seleziona `main` e cartella `/ (root)`.
-5. Salva.
+```bash
+npm ci
+npm run dev
+```
 
-`index.html` funziona anche direttamente su Vercel o altri hosting statici.
+## Controlli
 
-I progressi vengono salvati nel browser con `localStorage`.
+```bash
+npm run check
+```
+
+Il comando esegue Prettier, ESLint, Vitest, controllo TypeScript e build Vite.
+
+## Struttura
+
+- `src/data`: dati e mappe caricati separatamente per area geografica;
+- `src/game`: punteggio, sessione e persistenza;
+- `src/components`: funzioni DOM riutilizzabili;
+- `src/styles`: stile dell'applicazione;
+- `public`: file SEO copiati nella build.
+
+La pubblicazione su GitHub Pages avviene tramite GitHub Actions.

@@ -30,5 +30,19 @@ export function importProgress(serialized: string): ProgressStore {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Formato progressi non valido");
   }
+  for (const region of Object.values(value)) {
+    if (!region || typeof region !== "object" || Array.isArray(region)) {
+      throw new Error("Formato progressi non valido");
+    }
+    for (const entry of Object.values(region)) {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+        throw new Error("Formato progressi non valido");
+      }
+      const status = (entry as ProgressEntry).status;
+      if (status && !["new", "review", "learned"].includes(status)) {
+        throw new Error("Formato progressi non valido");
+      }
+    }
+  }
   return value as ProgressStore;
 }

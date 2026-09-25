@@ -1,12 +1,10 @@
-import {
-  STATES,
-  EUROPE,
-  SOUTH_AMERICA,
-  EUROPE_MAP,
-  SOUTH_MAP,
-} from "./data/regions";
+import { STATES } from "./data/usa";
+import { replaceMap } from "./components/map";
+import { badgeLabel } from "./components/badges";
 import { isAnswerCorrect } from "./game/scoring";
 import {
+  exportProgress,
+  importProgress,
   loadProgress,
   saveProgress,
   type ProgressEntry,
@@ -24,6 +22,10 @@ type Region = {
   label: string;
   kind: string;
   plural: string;
+  load: () => Promise<RegionPayload>;
+};
+
+type RegionPayload = {
   data: Record<string, AtlasItem>;
   map: string;
 };
@@ -37,30 +39,36 @@ function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   return element as T;
 }
 
-const USA_MAP = byId("mapWrap").innerHTML;
+const initialMap = byId("mapWrap").firstElementChild;
+if (!initialMap) throw new Error("Mappa USA non trovata");
+const USA_MAP = new XMLSerializer().serializeToString(initialMap);
 const REGIONS: Record<RegionId, Region> = {
   usa: {
     label: "USA",
     kind: "stato",
     plural: "stati",
-    data: STATES,
-    map: USA_MAP,
+    load: async () => ({ data: STATES, map: USA_MAP }),
   },
   europe: {
     label: "EUROPA",
     kind: "Paese",
     plural: "Paesi",
-    data: EUROPE,
-    map: EUROPE_MAP,
+    load: async () => {
+      const module = await import("./data/europe");
+      return { data: module.EUROPE, map: module.EUROPE_MAP };
+    },
   },
   south: {
     label: "SUD AMERICA",
     kind: "Paese",
     plural: "Paesi",
-    data: SOUTH_AMERICA,
-    map: SOUTH_MAP,
+    load: async () => {
+      const module = await import("./data/south-america");
+      return { data: module.SOUTH_AMERICA, map: module.SOUTH_MAP };
+    },
   },
 };
+const loadedRegions = new Map<RegionId, RegionPayload>();
 const STORAGE_KEY = "memory-atlas-v22";
 const $ = byId;
 const mapWrap = $("mapWrap"),
@@ -90,8 +98,10 @@ function regionStore(): Record<string, ProgressEntry> {
 function isCorrect(value: string, item: AtlasItem): boolean {
   return isAnswerCorrect(value, item.answers);
 }
-function region(): Region {
-  return REGIONS[currentRegion];
+function region(): Region & RegionPayload {
+  const payload = loadedRegions.get(currentRegion);
+  if (!payload) throw new Error(`Regione ${currentRegion} non caricata`);
+  return { ...REGIONS[currentRegion], ...payload };
 }
 function learnedCount(): number {
   return Object.values(regionStore()).filter((x) => x.status === "learned")
@@ -106,9 +116,19 @@ function setView(view: "map" | "badges"): void {
     .forEach((b) => b.classList.toggle("active", b.dataset.view === view));
   if (!map) renderBadges();
 }
-function setRegion(id: string | undefined): void {
+async function setRegion(id: string | undefined): Promise<void> {
   if (!id || !(id in REGIONS)) return;
   const regionId = id as RegionId;
+  const selected = REGIONS[regionId];
+  if (!loadedRegions.has(regionId)) {
+    $("mapHint").textContent = "Caricamento mappa…";
+    try {
+      loadedRegions.set(regionId, await selected.load());
+    } catch {
+      toast("Impossibile caricare la mappa", true);
+      return;
+    }
+  }
   currentRegion = regionId;
   quickMode = false;
   clearTimeout(nextTimer);
@@ -117,7 +137,7 @@ function setRegion(id: string | undefined): void {
     .forEach((b) =>
       b.classList.toggle("active", b.dataset.region === regionId),
     );
-  mapWrap.innerHTML = region().map;
+  replaceMap(mapWrap, region().map);
   bindMap();
   paintMap();
   updateToolbar();
@@ -297,20 +317,54 @@ function renderBadges(): void {
     keys = Object.keys(r.data);
   $("badgeSummary").textContent =
     learnedCount() + " / " + keys.length + " consolidati";
-  const html = keys
-    .map((k) => {
-      const item = r.data[k],
-        s = rs[k]?.status || "new";
-      return `<div class="badge-card ${s}"><small>${k}</small><strong>${item.state}</strong><span>${s === "learned" ? "✓ " + item.capital : s === "review" ? "Da rivedere" : "Nuovo"}</span></div>`;
-    })
-    .join("");
-  $("badgeGrid").innerHTML = html;
+  const cards = keys.map((key) => {
+    const item = r.data[key];
+    const status = rs[key]?.status || "new";
+    const card = document.createElement("div");
+    card.className = `badge-card ${status}`;
+    const code = document.createElement("small");
+    code.textContent = key;
+    const name = document.createElement("strong");
+    name.textContent = item.state;
+    const label = document.createElement("span");
+    label.textContent = badgeLabel(status, item.capital);
+    card.append(code, name, label);
+    return card;
+  });
+  $("badgeGrid").replaceChildren(...cards);
+}
+
+function downloadProgress(): void {
+  const blob = new Blob([exportProgress(store)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `memory-atlas-progressi-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  toast("Progressi esportati");
+}
+
+async function uploadProgress(file: File): Promise<void> {
+  try {
+    const imported = importProgress(await file.text());
+    if (!confirm("Importare questi progressi e sostituire quelli attuali?"))
+      return;
+    store = imported;
+    saveStore();
+    paintMap();
+    updateToolbar();
+    renderBadges();
+    toast("Progressi importati");
+  } catch {
+    toast("File progressi non valido", true);
+  }
 }
 
 document
   .querySelectorAll<HTMLElement>("[data-region]")
   .forEach((b) =>
-    b.addEventListener("click", () => setRegion(b.dataset.region)),
+    b.addEventListener("click", () => void setRegion(b.dataset.region)),
   );
 document
   .querySelectorAll<HTMLElement>("[data-view]")
@@ -374,4 +428,12 @@ $("resetBtn").onclick = () => {
     toast("Progressi azzerati");
   }
 };
-setRegion("usa");
+$("exportBtn").onclick = downloadProgress;
+$("importBtn").onclick = () => $<HTMLInputElement>("importFile").click();
+$<HTMLInputElement>("importFile").addEventListener("change", (event) => {
+  const target = event.currentTarget as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) void uploadProgress(file);
+  target.value = "";
+});
+void setRegion("usa");

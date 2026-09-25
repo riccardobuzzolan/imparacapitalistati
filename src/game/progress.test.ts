@@ -12,4 +12,9 @@ describe("progress import/export", () => {
   it("rifiuta valori non strutturati", () => {
     expect(() => importProgress("[]")).toThrow();
   });
+
+  it("rifiuta valori annidati e stati non validi", () => {
+    expect(() => importProgress('{"usa":null}')).toThrow();
+    expect(() => importProgress('{"usa":{"AL":{"status":"done"}}}')).toThrow();
+  });
 });
