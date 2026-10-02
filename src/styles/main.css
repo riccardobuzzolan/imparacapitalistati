@@ -466,6 +466,9 @@ main {
 .result.bad {
   background: var(--review);
 }
+.result.bad .auto-bar {
+  display: none;
+}
 .result-mark {
   font-size: 58px;
   line-height: 1;
@@ -624,8 +627,8 @@ main {
     justify-content: start;
   }
   .map-wrap svg {
-    min-width: 720px;
-    width: 720px;
+    min-width: 0;
+    width: 100%;
     height: auto;
     max-height: none;
   }
