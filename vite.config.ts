@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+const base = process.env.VERCEL === "1" ? "/" : "/imparacapitalistati/";
+
 export default defineConfig({
-  base: "/imparacapitalistati/",
+  base,
   plugins: [
     VitePWA({
       registerType: "autoUpdate",
@@ -13,6 +15,14 @@ export default defineConfig({
         theme_color: "#f4f5f2",
         background_color: "#f4f5f2",
         display: "standalone",
+        icons: [
+          {
+            src: "icon.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any maskable",
+          },
+        ],
       },
     }),
   ],
