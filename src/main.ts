@@ -77,6 +77,7 @@ const mapWrap = $("mapWrap"),
   resultPanel = $("resultPanel"),
   input = $<HTMLInputElement>("answerInput");
 let currentRegion: RegionId = "usa",
+  currentView: "map" | "badges" = "map",
   current: AtlasItem | null = null,
   currentCode: string | null = null,
   quickMode = false,
@@ -107,7 +108,17 @@ function learnedCount(): number {
   return Object.values(regionStore()).filter((x) => x.status === "learned")
     .length;
 }
-function setView(view: "map" | "badges"): void {
+function routeHash(): string {
+  return `#${currentRegion}/${currentView}`;
+}
+function writeRoute(replace = false): void {
+  const hash = routeHash();
+  if (location.hash === hash) return;
+  if (replace) history.replaceState(null, "", hash);
+  else history.pushState(null, "", hash);
+}
+function setView(view: "map" | "badges", updateRoute = true): void {
+  currentView = view;
   const map = view === "map";
   $("mapView").classList.toggle("active", map);
   $("badgeView").classList.toggle("active", !map);
@@ -115,8 +126,12 @@ function setView(view: "map" | "badges"): void {
     .querySelectorAll<HTMLElement>("[data-view]")
     .forEach((b) => b.classList.toggle("active", b.dataset.view === view));
   if (!map) renderBadges();
+  if (updateRoute) writeRoute();
 }
-async function setRegion(id: string | undefined): Promise<void> {
+async function setRegion(
+  id: string | undefined,
+  updateRoute = true,
+): Promise<void> {
   if (!id || !(id in REGIONS)) return;
   const regionId = id as RegionId;
   const selected = REGIONS[regionId];
@@ -141,7 +156,17 @@ async function setRegion(id: string | undefined): Promise<void> {
   bindMap();
   paintMap();
   updateToolbar();
-  setView("map");
+  setView("map", false);
+  if (updateRoute) writeRoute();
+}
+async function applyRoute(replaceMissing = false): Promise<void> {
+  const [rawRegion, rawView] = location.hash.replace(/^#/, "").split("/");
+  const regionId: RegionId =
+    rawRegion && rawRegion in REGIONS ? (rawRegion as RegionId) : "usa";
+  const view: "map" | "badges" = rawView === "badges" ? "badges" : "map";
+  await setRegion(regionId, false);
+  setView(view, false);
+  if (replaceMissing || location.hash !== routeHash()) writeRoute(true);
 }
 function updateToolbar(): void {
   const r = region(),
@@ -157,13 +182,28 @@ function updateToolbar(): void {
     "Tocca " + (r.kind === "stato" ? "uno stato" : "un Paese");
 }
 function bindMap(): void {
-  mapWrap.querySelectorAll<HTMLElement>(".state-path").forEach((el) =>
-    el.addEventListener("click", () => {
+  mapWrap.querySelectorAll<HTMLElement>(".state-path").forEach((el) => {
+    const code = el.dataset.state || el.dataset.code;
+    const item = code ? region().data[code] : undefined;
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "button");
+    el.setAttribute(
+      "aria-label",
+      item ? `${region().kind} ${item.state}` : "Elemento della mappa",
+    );
+    const activate = (): void => {
       quickMode = false;
       updateToolbar();
-      openItem(el.dataset.state || el.dataset.code, el);
-    }),
-  );
+      openItem(code, el);
+    };
+    el.addEventListener("click", activate);
+    el.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activate();
+      }
+    });
+  });
 }
 function paintMap(): void {
   const rs = regionStore();
@@ -265,18 +305,15 @@ function showResult(mode: ResultMode, given = ""): void {
   $("resultContext").textContent = item.state + " · capitale";
   $("givenAnswer").textContent = given || "—";
   $("correctAnswer").textContent = item.capital;
-  const duration = good ? 1050 : mode === "wrong" ? 1750 : 1500;
-  $("autoBar").style.setProperty("--close-time", duration / 1000 + "s");
-  $("autoBar").replaceWith($("autoBar").cloneNode(true));
-  autoTimer = setTimeout(() => {
-    toast(
-      good
-        ? "✓ " + item.state + " · " + item.capital
-        : "↻ " + item.state + " · " + item.capital,
-      !good,
-    );
-    closeModal({ continueQuick: true });
-  }, duration);
+  if (good) {
+    const duration = 1350;
+    $("autoBar").style.setProperty("--close-time", duration / 1000 + "s");
+    $("autoBar").replaceWith($("autoBar").cloneNode(true));
+    autoTimer = setTimeout(() => {
+      toast("✓ " + item.state + " · " + item.capital);
+      closeModal({ continueQuick: true });
+    }, duration);
+  }
 }
 function checkAnswer(): void {
   if (!current || resultPanel.classList.contains("show")) return;
@@ -436,4 +473,5 @@ $<HTMLInputElement>("importFile").addEventListener("change", (event) => {
   if (file) void uploadProgress(file);
   target.value = "";
 });
-void setRegion("usa");
+window.addEventListener("hashchange", () => void applyRoute());
+void applyRoute(true);
