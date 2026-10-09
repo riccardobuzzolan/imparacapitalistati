@@ -1,13 +1,23 @@
 /* A low-duty-cycle live favicon for Chromium, with the SVG as native/static fallback. */
 (() => {
   const icon = document.querySelector("link[data-favicon-motion]");
-  if (!icon || !window.matchMedia || !document.createElement("canvas").getContext) return;
+  if (
+    !icon ||
+    !window.matchMedia ||
+    !document.createElement("canvas").getContext
+  )
+    return;
 
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const original = icon.href;
   const point = (icon.dataset.faviconPoint || "32,32").split(",").map(Number);
   const hex = icon.dataset.faviconAccent || "#0bbbd2";
-  if (point.length !== 2 || point.some((x) => !Number.isFinite(x)) || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  if (
+    point.length !== 2 ||
+    point.some((x) => !Number.isFinite(x)) ||
+    !/^#[0-9a-fA-F]{6}$/.test(hex)
+  )
+    return;
   const red = parseInt(hex.slice(1, 3), 16);
   const green = parseInt(hex.slice(3, 5), 16);
   const blue = parseInt(hex.slice(5, 7), 16);
@@ -47,9 +57,11 @@
     function pulse() {
       if (document.hidden || motion.matches) return;
       for (let index = 0; index < frames.length; index++) {
-        delays.push(setTimeout(() => {
-          if (!document.hidden && !motion.matches) icon.href = frames[index];
-        }, index * 180));
+        delays.push(
+          setTimeout(() => {
+            if (!document.hidden && !motion.matches) icon.href = frames[index];
+          }, index * 180),
+        );
       }
       delays.push(setTimeout(restore, frames.length * 180 + 120));
     }
@@ -62,10 +74,14 @@
     motion.addEventListener?.("change", () => {
       if (motion.matches) restore();
     });
-    window.addEventListener("pagehide", () => {
-      clearInterval(interval);
-      restore();
-    }, { once: true });
+    window.addEventListener(
+      "pagehide",
+      () => {
+        clearInterval(interval);
+        restore();
+      },
+      { once: true },
+    );
   };
   bitmap.src = original;
 })();
