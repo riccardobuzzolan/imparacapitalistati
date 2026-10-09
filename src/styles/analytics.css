@@ -1,0 +1,55 @@
+.analytics-consent {
+  position: fixed;
+  z-index: 10000;
+  bottom: 3.5rem;
+  right: 1rem;
+  width: min(30rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 5rem);
+  overflow: auto;
+  padding: 1.2rem;
+  background: #fff;
+  color: #17252b;
+  border: 1px solid #bcc7c7;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 24px #0002;
+  font:
+    0.9rem/1.5 system-ui,
+    sans-serif;
+}
+.analytics-consent[hidden] {
+  display: none;
+}
+.analytics-consent a {
+  color: #14556a;
+  text-decoration: underline;
+}
+.analytics-consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.analytics-consent button,
+.analytics-settings {
+  padding: 0.6rem 0.8rem;
+  color: #17252b;
+  background: #edf3f3;
+  border: 1px solid #82999c;
+  border-radius: 0.4rem;
+  font: inherit;
+  cursor: pointer;
+}
+.analytics-consent button:focus-visible,
+.analytics-settings:focus-visible {
+  outline: 3px solid #14556a;
+  outline-offset: 2px;
+}
+.analytics-settings {
+  position: fixed;
+  z-index: 10000;
+  bottom: 0.75rem;
+  right: 1rem;
+  font:
+    0.85rem system-ui,
+    sans-serif;
+}

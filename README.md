@@ -39,3 +39,9 @@ GitHub Pages è pubblicato da GitHub Actions su `main`. Vercel costruisce lo ste
 ## Variabili ambiente
 
 Nessuna variabile ambiente applicativa è richiesta.
+
+## Statistiche facoltative
+
+GA4 usa il flusso G-30SFB80YPY solo sui due domini di produzione indicati sopra. Il banner permette di accettare o rifiutare le statistiche con la stessa facilità. La scelta dura 180 giorni; il pulsante Statistiche consente di cambiarla. Il tag Google non viene caricato prima dell'accettazione e resta bloccato sulle preview, sul sito portfolio e su localhost. La revoca disabilita Analytics, cancella i cookie GA accessibili e ricarica la pagina per scaricare il tag.
+
+Raccolta prevista: una page_view per caricamento, quiz_start all'avvio del quiz rapido e region_select alla scelta della mappa. URL senza query o frammenti, referrer limitato all'origine. Nessuna risposta, testo digitato o progresso personale viene inviato. Pubblicità e Google Signals disattivati nel tag. La misurazione avanzata del nuovo flusso deve essere disattivata per evitare eventi automatici e URL non controllati. Questa configurazione tecnica non sostituisce la revisione completa dell'informativa privacy del titolare.

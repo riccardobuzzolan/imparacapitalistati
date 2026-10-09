@@ -1,4 +1,5 @@
 import { STATES } from "./data/usa";
+import { startAnalytics } from "./analytics";
 import { replaceMap } from "./components/map";
 import { badgeLabel } from "./components/badges";
 import { isAnswerCorrect } from "./game/scoring";
@@ -475,3 +476,4 @@ $<HTMLInputElement>("importFile").addEventListener("change", (event) => {
 });
 window.addEventListener("hashchange", () => void applyRoute());
 void applyRoute(true);
+startAnalytics();
