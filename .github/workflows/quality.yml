@@ -26,10 +26,6 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm audit --omit=dev --audit-level=high
-      - name: Formatting preview
-        run: |
-          npx prettier index.html | diff -u index.html - || true
-          npx prettier public/favicon-motion.js | diff -u public/favicon-motion.js - || true
       - run: npm run check
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
