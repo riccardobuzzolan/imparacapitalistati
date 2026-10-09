@@ -680,12 +680,57 @@ main {
 }
 
 /* Preview for the current Memory Atlas release. */
-.atlas-new-release { padding: 24px 16px 32px; border-top: 1px solid #dfe5e2; max-width: 1280px; margin: 28px auto; }
-.atlas-new-heading { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 16px; }
-.atlas-new-heading h2 { font-size: clamp(21px, 3vw, 32px); margin: 5px 0; color: #10171c; }
-.atlas-new-heading span { font-size: 11px; letter-spacing: .1em; font-weight: 750; color: #667378; }
-.atlas-new-heading p { max-width: 580px; font-size: 13px; line-height: 1.5; color: #667378; }
-.atlas-new-heading a { color: #10171c; font-weight: 650; text-decoration: underline; text-underline-offset: 4px; }
-.atlas-new-preview { border: 1px solid #dfe5e2; background: #f6f8f7; }
-.atlas-new-preview iframe { display: block; width: 100%; height: min(710px, 75svh); min-height: 430px; border: 0; }
-@media (max-width: 650px) { .atlas-new-preview iframe { height: 70svh; min-height: 450px; } }
+.atlas-new-release {
+  padding: 24px 16px 32px;
+  border-top: 1px solid #dfe5e2;
+  max-width: 1280px;
+  margin: 28px auto;
+}
+.atlas-new-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+.atlas-new-heading h2 {
+  font-size: clamp(21px, 3vw, 32px);
+  margin: 5px 0;
+  color: #10171c;
+}
+.atlas-new-heading span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 750;
+  color: #667378;
+}
+.atlas-new-heading p {
+  max-width: 580px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #667378;
+}
+.atlas-new-heading a {
+  color: #10171c;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.atlas-new-preview {
+  border: 1px solid #dfe5e2;
+  background: #f6f8f7;
+}
+.atlas-new-preview iframe {
+  display: block;
+  width: 100%;
+  height: min(710px, 75svh);
+  min-height: 430px;
+  border: 0;
+}
+@media (max-width: 650px) {
+  .atlas-new-preview iframe {
+    height: 70svh;
+    min-height: 450px;
+  }
+}
