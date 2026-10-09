@@ -26,6 +26,8 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm audit --omit=dev --audit-level=high
+      - name: Show requested HTML formatting
+        run: npx prettier index.html | diff -u index.html - || true
       - run: npm run check
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
