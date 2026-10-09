@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="Impara capitali e stati">
+  <style>
+    @keyframes locate{0%,83%,100%{transform:translateY(0)}90%{transform:translateY(-2px)}}
+    @keyframes sparkle{0%,78%,100%{opacity:1;transform:rotate(0)}91%{opacity:.7;transform:rotate(18deg)}}
+    .locate{transform-origin:39px 25px;animation:locate 5s ease-in-out infinite}
+    .star{transform-origin:39px 22px;animation:sparkle 5s ease-in-out infinite}
+    @media (prefers-reduced-motion:reduce){.locate,.star{animation:none}}
+  </style>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#fff"/>
+  <circle cx="32" cy="32" r="25" fill="#fbfdff" stroke="#132839" stroke-width="4"/>
+  <path d="M10 29 17 19 27 17l5 7-7 6-2 9 9 10-6 6-10-7-5-12Z" fill="#187bd0"/>
+  <path d="M31 11l6-1 9 8-1 8 8 3 2 12-8 10-8-7-5-11-4-7 5-5Z" fill="#187bd0"/>
+  <g class="locate"><path d="M40 11c-7.6 0-13 5.7-13 13 0 8.3 13 21 13 21s13-12.7 13-21c0-7.3-5.4-13-13-13Z" fill="#f7ad22"/><circle cx="40" cy="23" r="7.4" fill="#fff"/><path class="star" d="m40 16.9 1.8 3.8 4.3.6-3.1 3 0.7 4.3-3.7-2-3.8 2 .7-4.3-3.1-3 4.3-.6Z" fill="#14283b"/></g>
+</svg>
