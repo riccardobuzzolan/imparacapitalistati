@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="Impara capitali e stati">
   <style>
-    @keyframes locate{0%,83%,100%{transform:translateY(0)}90%{transform:translateY(-2px)}}
-    @keyframes sparkle{0%,78%,100%{opacity:1;transform:rotate(0)}91%{opacity:.7;transform:rotate(18deg)}}
-    .locate{transform-origin:39px 25px;animation:locate 5s ease-in-out infinite}
-    .star{transform-origin:39px 22px;animation:sparkle 5s ease-in-out infinite}
+    @keyframes locate{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+    @keyframes sparkle{0%,100%{opacity:1;transform:rotate(-8deg)}50%{opacity:.75;transform:rotate(14deg)}}
+    .locate{transform-origin:39px 25px;animation:locate 2.9s ease-in-out infinite}
+    .star{transform-origin:39px 22px;animation:sparkle 2.9s ease-in-out infinite}
     @media (prefers-reduced-motion:reduce){.locate,.star{animation:none}}
   </style>
   <rect x="2" y="2" width="60" height="60" rx="14" fill="#fff"/>
