@@ -10,8 +10,8 @@ assert.ok(
   html.includes(`href="${canonical}"`),
   "Canonical must remain the primary Pages URL",
 );
-for (const tag of html.matchAll(/<(?:script|link)\b[^>]*>/g)) {
-  const ref = tag[0].match(/(?:src|href)="([^"]+)"/)?.[1];
+for (const tag of html.matchAll(/<(?:script|link)\b[^>]*>/gi)) {
+  const ref = tag[0].match(/(?:src|href)="([^"]+)"/i)?.[1];
   if (!ref || /^(?:https?:|data:|#)/.test(ref)) continue;
   const assetPath = new URL(ref, `https://build.invalid${base}`).pathname;
   assert.ok(
