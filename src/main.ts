@@ -4,7 +4,9 @@ import { replaceMap } from "./components/map";
 import { badgeLabel } from "./components/badges";
 import { isAnswerCorrect } from "./game/scoring";
 import {
-  exportProgress,
+  recoveryExport,
+  replaceProgress,
+  getProgressWarning,
   importProgress,
   loadProgress,
   saveProgress,
@@ -87,11 +89,24 @@ let currentRegion: RegionId = "usa",
   nextTimer: ReturnType<typeof setTimeout> | undefined,
   exactTimer: ReturnType<typeof setTimeout> | undefined;
 let store: ProgressStore = loadStore();
+let regionRequest = 0;
+let returnFocus: Element | null = null;
+const backgroundState = new Map<HTMLElement, boolean>();
+function storageWarning(message = getProgressWarning(STORAGE_KEY) || ""): void {
+  $("storageStatus").textContent = message;
+  $("storageStatus").hidden = !message;
+}
 function loadStore(): ProgressStore {
   return loadProgress(STORAGE_KEY);
 }
 function saveStore(): void {
-  saveProgress(STORAGE_KEY, store);
+  const result = saveProgress(STORAGE_KEY, store);
+  storageWarning(
+    result.warning ||
+      (result.ok
+        ? ""
+        : "Salvataggio non disponibile. Esporta i progressi prima di chiudere questa pagina."),
+  );
 }
 function regionStore(): Record<string, ProgressEntry> {
   if (!store[currentRegion]) store[currentRegion] = {};
@@ -106,8 +121,10 @@ function region(): Region & RegionPayload {
   return { ...REGIONS[currentRegion], ...payload };
 }
 function learnedCount(): number {
-  return Object.values(regionStore()).filter((x) => x.status === "learned")
-    .length;
+  const progress = regionStore();
+  return Object.keys(region().data).filter(
+    (code) => progress[code]?.status === "learned",
+  ).length;
 }
 function routeHash(): string {
   return `#${currentRegion}/${currentView}`;
@@ -132,8 +149,12 @@ function setView(view: "map" | "badges", updateRoute = true): void {
 async function setRegion(
   id: string | undefined,
   updateRoute = true,
-): Promise<void> {
-  if (!id || !(id in REGIONS)) return;
+): Promise<boolean> {
+  if (!id || !Object.hasOwn(REGIONS, id)) return false;
+  const request = ++regionRequest;
+  closeModal();
+  quickMode = false;
+  clearTimers();
   const regionId = id as RegionId;
   const selected = REGIONS[regionId];
   if (!loadedRegions.has(regionId)) {
@@ -141,10 +162,18 @@ async function setRegion(
     try {
       loadedRegions.set(regionId, await selected.load());
     } catch {
-      toast("Impossibile caricare la mappa", true);
-      return;
+      if (request === regionRequest) {
+        if (loadedRegions.has(currentRegion)) updateToolbar();
+        else $("mapHint").textContent = "Impossibile caricare la mappa";
+        toast("Impossibile caricare la mappa", true);
+      }
+      return false;
     }
   }
+  if (request !== regionRequest) return false;
+  closeModal();
+  clearTimers();
+  quickMode = false;
   currentRegion = regionId;
   quickMode = false;
   clearTimeout(nextTimer);
@@ -159,13 +188,16 @@ async function setRegion(
   updateToolbar();
   setView("map", false);
   if (updateRoute) writeRoute();
+  return true;
 }
 async function applyRoute(replaceMissing = false): Promise<void> {
   const [rawRegion, rawView] = location.hash.replace(/^#/, "").split("/");
   const regionId: RegionId =
-    rawRegion && rawRegion in REGIONS ? (rawRegion as RegionId) : "usa";
+    rawRegion && Object.hasOwn(REGIONS, rawRegion)
+      ? (rawRegion as RegionId)
+      : "usa";
   const view: "map" | "badges" = rawView === "badges" ? "badges" : "map";
-  await setRegion(regionId, false);
+  if (!(await setRegion(regionId, false))) return;
   setView(view, false);
   if (replaceMissing || location.hash !== routeHash()) writeRoute(true);
 }
@@ -234,6 +266,20 @@ function openItem(code: string | undefined, path: Element | null = null): void {
   if (!code) return;
   const item = region().data[code];
   if (!item) return;
+  if (!modalBg.classList.contains("open")) {
+    returnFocus = document.activeElement;
+    for (const child of document.body.children) {
+      if (
+        child instanceof HTMLElement &&
+        child !== modalBg &&
+        child.id !== "toast" &&
+        child.tagName !== "SCRIPT"
+      ) {
+        backgroundState.set(child, child.inert);
+        child.inert = true;
+      }
+    }
+  }
   current = item;
   currentCode = code;
   mapWrap
@@ -254,15 +300,23 @@ function openItem(code: string | undefined, path: Element | null = null): void {
     ? "QUIZ RAPIDO · ESC PER USCIRE"
     : "INVIO PER VERIFICARE";
   modalBg.classList.add("open");
+  modalBg.setAttribute("aria-hidden", "false");
   $("mapHint").classList.add("hide");
-  setTimeout(() => input.focus(), 50);
+  input.focus();
 }
 function closeModal({
   continueQuick = false,
 }: { continueQuick?: boolean } = {}): void {
-  clearTimeout(autoTimer);
-  clearTimeout(exactTimer);
+  clearTimers();
   modalBg.classList.remove("open");
+  modalBg.setAttribute("aria-hidden", "true");
+  current = null;
+  currentCode = null;
+  for (const [element, wasInert] of backgroundState) element.inert = wasInert;
+  backgroundState.clear();
+  if (returnFocus?.isConnected && "focus" in returnFocus)
+    (returnFocus as HTMLElement).focus();
+  returnFocus = null;
   mapWrap
     .querySelectorAll(".state-path")
     .forEach((x) => x.classList.remove("selected"));
@@ -284,7 +338,7 @@ function mark(status: LearningStatus): void {
   updateToolbar();
 }
 function showResult(mode: ResultMode, given = ""): void {
-  if (!current) return;
+  if (!current || resultPanel.classList.contains("show")) return;
   const item = current;
   clearTimeout(exactTimer);
   quizPanel.style.display = "none";
@@ -306,6 +360,7 @@ function showResult(mode: ResultMode, given = ""): void {
   $("resultContext").textContent = item.state + " · capitale";
   $("givenAnswer").textContent = given || "—";
   $("correctAnswer").textContent = item.capital;
+  $("fastNext").focus();
   if (good) {
     const duration = 1350;
     $("autoBar").style.setProperty("--close-time", duration / 1000 + "s");
@@ -373,29 +428,55 @@ function renderBadges(): void {
 }
 
 function downloadProgress(): void {
-  const blob = new Blob([exportProgress(store)], { type: "application/json" });
+  let serialized: string;
+  try {
+    serialized = recoveryExport(STORAGE_KEY, store);
+  } catch (error) {
+    toast(
+      error instanceof Error
+        ? error.message
+        : "Impossibile esportare i progressi",
+      true,
+    );
+    return;
+  }
+  $<HTMLTextAreaElement>("backupText").value = serialized;
+  $("backupFallback").hidden = false;
+  const blob = new Blob([serialized], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.download = `memory-atlas-progressi-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.append(link);
   link.click();
-  URL.revokeObjectURL(url);
-  toast("Progressi esportati");
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  toast("Backup pronto: scarica il file o copia il testo JSON");
 }
 
 async function uploadProgress(file: File): Promise<void> {
   try {
+    if (file.size > 5 * 1024 * 1024)
+      throw new Error("Backup troppo grande (massimo 5 MB)");
     const imported = importProgress(await file.text());
     if (!confirm("Importare questi progressi e sostituire quelli attuali?"))
       return;
+    const result = replaceProgress(STORAGE_KEY, imported);
+    if (!result.ok) {
+      storageWarning(result.warning);
+      return;
+    }
     store = imported;
-    saveStore();
+    storageWarning();
     paintMap();
     updateToolbar();
     renderBadges();
     toast("Progressi importati");
-  } catch {
-    toast("File progressi non valido", true);
+  } catch (error) {
+    toast(
+      error instanceof Error ? error.message : "File progressi non valido",
+      true,
+    );
   }
 }
 
@@ -444,12 +525,29 @@ input.addEventListener("input", () => {
     exactTimer = setTimeout(checkAnswer, 160);
 });
 document.addEventListener("keydown", (e) => {
+  if (e.defaultPrevented) return;
+  if (e.key === "Tab" && modalBg.classList.contains("open")) {
+    const controls = [
+      ...modalBg.querySelectorAll<HTMLElement>("button,input,[tabindex='0']"),
+    ].filter((el) => el.offsetParent !== null);
+    const first = controls[0],
+      last = controls.at(-1);
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last?.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first?.focus();
+    }
+    return;
+  }
   if (e.key === "Escape" && modalBg.classList.contains("open")) {
     quickMode = false;
     updateToolbar();
     closeModal();
   } else if (
     (e.key === "Enter" || e.key === " ") &&
+    modalBg.classList.contains("open") &&
     resultPanel.classList.contains("show")
   ) {
     e.preventDefault();
@@ -458,8 +556,13 @@ document.addEventListener("keydown", (e) => {
 });
 $("resetBtn").onclick = () => {
   if (confirm("Azzero tutti i progressi di Memory Atlas?")) {
+    const result = replaceProgress(STORAGE_KEY, {});
+    if (!result.ok) {
+      storageWarning(result.warning);
+      return;
+    }
     store = {};
-    saveStore();
+    storageWarning();
     paintMap();
     updateToolbar();
     renderBadges();
@@ -476,4 +579,5 @@ $<HTMLInputElement>("importFile").addEventListener("change", (event) => {
 });
 window.addEventListener("hashchange", () => void applyRoute());
 void applyRoute(true);
+storageWarning();
 startAnalytics();

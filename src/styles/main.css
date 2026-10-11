@@ -678,6 +678,20 @@ main {
     transition-duration: 0.01ms !important;
   }
 }
+#storageStatus {
+  padding: 12px;
+  border: 1px solid #8e514c;
+  border-radius: 8px;
+}
+#backupFallback {
+  margin-top: 20px;
+}
+#backupText {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 8px;
+}
 
 /* Preview for the current Memory Atlas release. */
 .atlas-new-release {

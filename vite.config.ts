@@ -8,19 +8,35 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: "script",
+      workbox: {
+        cleanupOutdatedCaches: true,
+        navigateFallback: null,
+        globPatterns: ["**/*.{js,css,html,svg,png,xml,txt}"],
+      },
       manifest: {
         name: "Memory Atlas",
+        lang: "it",
         short_name: "Memory Atlas",
         description: "Quiz su stati e capitali",
         theme_color: "#f4f5f2",
         background_color: "#f4f5f2",
         display: "standalone",
+        id: base,
+        start_url: base,
+        scope: base,
         icons: [
           {
-            src: "icon.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "any maskable",
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
           },
         ],
       },

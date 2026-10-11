@@ -25,9 +25,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm audit --omit=dev --audit-level=high
+      - run: npm audit --audit-level=high
+      - name: Verify the Vercel root build
+        run: npm run build
+        env:
+          VERCEL: "1"
       - run: npm run check
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         if: github.ref == 'refs/heads/main'
         with:
           path: dist
@@ -44,4 +48,4 @@ jobs:
     environment:
       name: github-pages
     steps:
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
