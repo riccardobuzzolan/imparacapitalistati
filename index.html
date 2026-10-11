@@ -21,6 +21,27 @@
     <meta property="og:locale" content="it_IT" />
     <meta property="og:title" content="Memory Atlas" />
     <meta
+      property="og:image"
+      content="https://riccardobuzzolan.github.io/imparacapitalistati/icon-512.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="Memory Atlas: quiz sulle capitali di USA, Europa e Sud America"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="Memory Atlas | Quiz su stati e capitali"
+    />
+    <meta
+      name="twitter:description"
+      content="Quiz gratuito sulle capitali di USA, Europa e Sud America."
+    />
+    <meta
+      name="twitter:image"
+      content="https://riccardobuzzolan.github.io/imparacapitalistati/icon-512.png"
+    />
+    <meta
       property="og:description"
       content="Quiz gratuito sulle capitali di Stati Uniti, Europa e Sud America."
     />
@@ -38,12 +59,17 @@
       data-favicon-accent="#f7ad22"
     />
     <link rel="stylesheet" href="/src/styles/main.css" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
     <script src="./favicon-motion.js" defer></script>
   </head>
   <body>
     <div class="app">
       <header class="topbar">
-        <button class="brand" id="homeBtn" aria-label="Vai alla mappa">
+        <button
+          class="brand"
+          id="homeBtn"
+          aria-label="MA Memory Atlas: vai alla mappa"
+        >
           <span class="brand-mark">MA</span><span>Memory Atlas</span>
         </button>
         <nav class="region-tabs" aria-label="Area geografica">
@@ -57,6 +83,11 @@
         </nav>
       </header>
       <main>
+        <p id="storageStatus" role="status" hidden></p>
+        <noscript
+          >Per giocare serve JavaScript. Il quiz salva i progressi solo nel tuo
+          browser.</noscript
+        >
         <section class="map-view active" id="mapView">
           <div class="map-toolbar">
             <div class="area-title">
@@ -1046,6 +1077,7 @@
               <button class="reset" id="importBtn">Importa</button>
               <input
                 id="importFile"
+                aria-label="Importa progressi da un file JSON"
                 class="visually-hidden"
                 type="file"
                 accept="application/json,.json"
@@ -1055,6 +1087,19 @@
             </div>
           </div>
           <div class="badge-grid" id="badgeGrid"></div>
+          <details id="backupFallback" hidden>
+            <summary>Copia del backup JSON</summary>
+            <label for="backupText"
+              >Se il download non parte, seleziona e copia questo testo in un
+              file .json.</label
+            >
+            <textarea
+              id="backupText"
+              readonly
+              rows="8"
+              spellcheck="false"
+            ></textarea>
+          </details>
         </section>
         <!-- prettier-ignore -->
         <section class="atlas-new-release" aria-labelledby="atlas-new-title">
@@ -1092,6 +1137,7 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="modalName"
+      aria-hidden="true"
     >
       <div class="modal" id="modalPanel">
         <div class="quiz" id="quizPanel">
@@ -1137,7 +1183,7 @@
         </div>
       </div>
     </div>
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

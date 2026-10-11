@@ -22,7 +22,7 @@ npm run dev
 npm run check
 ```
 
-Il comando esegue Prettier, ESLint, Vitest, controllo TypeScript e build Vite. La CI esegue anche l'audit delle dipendenze di produzione.
+Il comando esegue Prettier, ESLint, Vitest, controllo dei sorgenti e di alcuni formati di credenziali (valori oscurati), TypeScript, build e gate degli asset/SEO/PWA. La CI esegue anche l'audit completo, comprese le dipendenze di sviluppo, e costruisce entrambe le basi di pubblicazione. Le Actions sono fissate a commit; Dependabot propone aggiornamenti settimanali.
 
 ## Struttura
 
@@ -35,6 +35,20 @@ Il comando esegue Prettier, ESLint, Vitest, controllo TypeScript e build Vite. L
 ## Deploy
 
 GitHub Pages è pubblicato da GitHub Actions su `main`. Vercel costruisce lo stesso repository e usa `base: "/"`; GitHub Pages usa `/imparacapitalistati/`.
+
+Prima della pubblicazione usare un branch e verificare `quality` e `analyze`. Nelle impostazioni Pages selezionare **GitHub Actions** come source, per pubblicare `dist` tramite il workflow; una build Jekyll dalla radice pubblica i sorgenti TypeScript invece dell'app compilata. Il workflow non configura le protezioni di `main`: queste richiedono permessi amministrativi e, per alcuni repository privati, un piano compatibile.
+
+La PWA registra un service worker da uno script esterno, compatibile con la CSP Vercel. `start_url`, `scope` e `id` seguono la base; le icone PNG sono derivate dall'SVG originale. La cache contiene app e mappe locali; dopo una prima visita completa si può giocare offline. Non esiste una rewrite di tutte le navigazioni alla homepage: le pagine sconosciute devono conservare HTTP 404/noindex. I progressi sono in localStorage, separati per origine; le due copie non condividono automaticamente i dati. GitHub Pages non applica gli header personalizzati di `vercel.json`.
+
+## Progressi e recupero
+
+La chiave esistente `memory-atlas-v22` resta invariata. Lo schema versione 1 accetta i dati legacy e migra al primo salvataggio, conservando i byte precedenti. Dati corrotti o di versione futura non vengono sovrascritti durante il gioco: un avviso invita a esportarli, mentre i nuovi tentativi restano nella sessione. Accesso negato o quota esaurita non interrompono il quiz. Importazione e azzeramento richiedono conferma, archiviano il contenuto precedente e conservano lo stato corrente se la scrittura fallisce.
+
+Il backup comprende progressi e originali recuperabili, con limite di 5 MB misurato in UTF-8. L'esportazione offre download e testo JSON selezionabile; un backup invalido non modifica i dati. La normalizzazione conserva originali distinti senza accumulare wrapper ricorsivi a ogni importazione. Nessun progresso o risposta viene inviato a un backend o ad Analytics. Contatori/stati/prototype non validi vengono rifiutati preservando l'originale.
+
+## Rollback
+
+Conservare SHA e deployment precedente. Su Vercel ripristinare la produzione precedente dal dashboard; su Pages preparare un revert in branch, verificare la CI e ripubblicare il build. Esportare prima i progressi: il codice precedente non comprende lo schema versione 1, quindi un rollback del codice non autorizza a cancellare o reinterpretare i dati. Verificare entrambi gli hosting e il service worker dopo il rollback. Non usare reset forzati di `main`.
 
 ## Variabili ambiente
 

@@ -5,7 +5,7 @@
   --soft: #edf1ee;
   --cyan: #2bc4cf;
   --cyan-soft: #c8f0f2;
-  --muted: #66747a;
+  --muted: #59666c;
   --line: rgba(17, 24, 32, 0.14);
   --line-strong: rgba(17, 24, 32, 0.26);
   --review: #ecd7d3;
@@ -85,7 +85,7 @@ button {
   padding: 0 12px;
   font-size: 11px;
   font-weight: 650;
-  color: #66747a;
+  color: var(--muted);
 }
 .region-tabs button.active {
   background: var(--ink);
@@ -241,7 +241,7 @@ main {
   gap: 13px;
   align-items: center;
   padding: 9px 3px 0;
-  color: #748187;
+  color: var(--muted);
   font-size: 9px;
 }
 .legend span {
@@ -677,6 +677,20 @@ main {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+#storageStatus {
+  padding: 12px;
+  border: 1px solid #8e514c;
+  border-radius: 8px;
+}
+#backupFallback {
+  margin-top: 20px;
+}
+#backupText {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 8px;
 }
 
 /* Preview for the current Memory Atlas release. */

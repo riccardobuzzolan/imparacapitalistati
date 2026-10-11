@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/check-build.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm test && npm run build"
+    "check": "npm run format:check && npm run lint && npm test && npm run check:source && npm run build",
+    "check:source": "node scripts/check-source.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -22,6 +23,6 @@
     "typescript-eslint": "^8.44.1",
     "vite": "^7.1.7",
     "vite-plugin-pwa": "^1.0.3",
-    "vitest": "^3.2.4"
+    "vitest": "5.0.3"
   }
 }
