@@ -717,13 +717,13 @@ main {
   font-size: 11px;
   letter-spacing: 0.1em;
   font-weight: 750;
-  color: #667378;
+  color: var(--muted);
 }
 .atlas-new-heading p {
   max-width: 580px;
   font-size: 13px;
   line-height: 1.5;
-  color: #667378;
+  color: var(--muted);
 }
 .atlas-new-heading a {
   color: #10171c;

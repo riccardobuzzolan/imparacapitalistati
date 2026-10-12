@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: pages-${{ github.ref }}
@@ -48,4 +49,16 @@ jobs:
     environment:
       name: github-pages
     steps:
+      - name: Report Pages publishing source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if source="$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type' 2>/dev/null)"; then
+            printf 'Pages publishing source: %s\n' "$source" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$source" != "workflow" ]; then
+              echo '::warning::Select Settings > Pages > Source > GitHub Actions to prevent the source upload from competing with this compiled build.'
+            fi
+          else
+            echo '::warning::Pages source could not be read. Verify Settings > Pages > Source > GitHub Actions.'
+          fi
       - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
