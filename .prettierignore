@@ -1,3 +1,7 @@
 .git
 node_modules
 dist
+
+# Standalone browser canvas and favicon renderers
+public/motion-light.js
+public/favicon-motion.js
