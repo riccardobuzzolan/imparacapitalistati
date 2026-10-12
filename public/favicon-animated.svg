@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="Impara capitali e stati">
-  <style>
-    @keyframes locate{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
-    @keyframes sparkle{0%,100%{opacity:1;transform:rotate(-8deg)}50%{opacity:.75;transform:rotate(14deg)}}
-    .locate{transform-origin:39px 25px;animation:locate 2.9s ease-in-out infinite}
-    .star{transform-origin:39px 22px;animation:sparkle 2.9s ease-in-out infinite}
-    @media (prefers-reduced-motion:reduce){.locate,.star{animation:none}}
-  </style>
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="#fff"/>
-  <circle cx="32" cy="32" r="25" fill="#fbfdff" stroke="#132839" stroke-width="4"/>
-  <path d="M10 29 17 19 27 17l5 7-7 6-2 9 9 10-6 6-10-7-5-12Z" fill="#187bd0"/>
-  <path d="M31 11l6-1 9 8-1 8 8 3 2 12-8 10-8-7-5-11-4-7 5-5Z" fill="#187bd0"/>
-  <g class="locate"><path d="M40 11c-7.6 0-13 5.7-13 13 0 8.3 13 21 13 21s13-12.7 13-21c0-7.3-5.4-13-13-13Z" fill="#f7ad22"/><circle cx="40" cy="23" r="7.4" fill="#fff"/><path class="star" d="m40 16.9 1.8 3.8 4.3.6-3.1 3 0.7 4.3-3.7-2-3.8 2 .7-4.3-3.1-3 4.3-.6Z" fill="#14283b"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Globo con posizione geografica">
+<style>
+@keyframes pin{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+#motion{animation:pin 2.9s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){#motion{animation:none}}
+</style>
+<defs><clipPath id="globe"><circle cx="30" cy="33" r="24"/></clipPath></defs>
+<circle cx="30" cy="33" r="24" fill="#0C4052"/>
+<g clip-path="url(#globe)">
+<path d="M10 19 19 13 26 16 27 23 21 26 23 32 17 39 11 35 7 27ZM24 41l8-6 7 3 2 10-6 11-8-4ZM37 11l9 7-3 8 8 5-1 7-8 5-7-8 3-7-6-8Z" fill="#85C1B8"/>
+<path d="M7 33h46M30 9c-13 15-13 34 0 48M30 9c13 15 13 34 0 48" fill="none" stroke="#E5FAF3" stroke-width="1.5" stroke-opacity=".43"/>
+</g>
+<circle cx="30" cy="33" r="24" fill="none" stroke="#092D3C" stroke-width="2.5"/>
+<g id="motion"><path d="M43 7c-7.8 0-13 5.5-13 12.7C30 29.1 43 40 43 40s13-10.9 13-20.3C56 12.5 50.8 7 43 7Z" fill="#E7AB58" stroke="#092D3C" stroke-width="2.5" stroke-linejoin="round"/><circle cx="43" cy="19.5" r="4.2" fill="#0C4052"/></g>
 </svg>
