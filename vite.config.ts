@@ -10,6 +10,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: "script",
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: null,
         globPatterns: ["**/*.{js,css,html,svg,png,xml,txt}"],
