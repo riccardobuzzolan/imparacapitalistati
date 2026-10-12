@@ -44,6 +44,16 @@ assert.ok(
   "External CSP-compatible worker registration missing",
 );
 const worker = readFileSync(resolve(root, "sw.js"), "utf8");
+assert.match(
+  worker,
+  /self\.skipWaiting\(\)[,;]/,
+  "Updated worker must activate without a manual message",
+);
+assert.match(
+  worker,
+  /\.clientsClaim\(\)/,
+  "Updated worker must control existing pages",
+);
 assert.ok(
   !/NavigationRoute|createHandlerBoundToURL/.test(worker),
   "Unknown routes must not become cached home pages",
