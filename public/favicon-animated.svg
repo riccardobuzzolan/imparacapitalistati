@@ -1,30 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Globo con scia orbitale animata">
-<title>Impara Capitali · Orbita</title>
-<defs>
-<linearGradient id="ember" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#FFDA4D"/><stop offset=".42" stop-color="#FF9B30"/><stop offset="1" stop-color="#F45150"/>
-</linearGradient>
-<clipPath id="earth"><circle cx="32" cy="32" r="20"/></clipPath>
-</defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Globo attraversato da un'orbita animata">
+<title>Impara Capitali — Orbita</title><defs><linearGradient id="warm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E9AD58"/><stop offset="1" stop-color="#EE715F"/></linearGradient><clipPath id="land"><circle cx="32" cy="32" r="19.5"/></clipPath></defs>
 <style>
-#motion{transform-origin:32px 32px;animation:sweep 3.6s cubic-bezier(.55,0,.25,1) infinite}
-#paint{stroke-dasharray:82 100;animation:draw 3.6s cubic-bezier(.4,0,.2,1) infinite}
-#spark{transform-origin:32px 32px;animation:spark 3.6s ease-in-out infinite}
-@keyframes sweep{0%{transform:rotate(-64deg)}53%,78%{transform:rotate(22deg)}100%{transform:rotate(296deg)}}
-@keyframes draw{0%,6%{stroke-dashoffset:82;opacity:.3}48%,80%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-82;opacity:.45}}
-@keyframes spark{0%,8%,100%{transform:scale(.72);opacity:.15}45%,78%{transform:scale(1);opacity:1}}
-@media(prefers-reduced-motion:reduce){#motion,#paint,#spark{animation:none}#paint{stroke-dashoffset:0;opacity:1}#spark{opacity:1}}
+#trail{animation:draw 3.6s cubic-bezier(.38,.01,.22,1) infinite;stroke-dasharray:100;stroke-dashoffset:100}
+#spark{transform-origin:32px 32px;animation:orbit 3.6s cubic-bezier(.38,.01,.22,1) infinite}
+@keyframes draw{0%,10%{stroke-dashoffset:100;opacity:.35}57%,85%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:100;opacity:.35}}
+@keyframes orbit{0%,10%{transform:rotate(-115deg);opacity:0}57%,85%{transform:rotate(140deg);opacity:1}100%{transform:rotate(245deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){#trail,#spark{animation:none;stroke-dashoffset:0;opacity:1}}
 </style>
-<circle cx="32" cy="32" r="20" fill="#152F85"/>
-<g clip-path="url(#earth)" fill="#5DD6EE">
-<path d="M13 21 21 13l8 2 5 6-3 7-7 1-2 10-7-2-6-10Z"/>
-<path d="m29 41 7-5 10 4-2 12-7 8-5-7Z"/>
-<path d="m35 11 12 4 8 8-7 7-11-4 2-7Z"/>
-</g>
-<path d="M12 32h40M32 12c-9 10-9 30 0 40M32 12c9 10 9 30 0 40" fill="none" stroke="#ABF0FF" stroke-width="1.3" opacity=".42"/>
-<g id="motion" fill="none" stroke="url(#ember)" stroke-linecap="round">
-<path id="paint" d="M11 38a23 23 0 1 1 43-11" stroke-width="8" pathLength="100"/>
-<path d="M52 20q4 2 4 9" stroke="#FFCF48" stroke-width="4"/>
-</g>
-<g id="spark"><path d="M48 9c-4 0-7 3-7 7 0 5 7 11 7 11s7-6 7-11c0-4-3-7-7-7Z" fill="#FFB03D" stroke="#17377F" stroke-width="1.6"/><circle cx="48" cy="16" r="2.7" fill="#17377F"/></g>
+<circle cx="32" cy="32" r="20" fill="#133F52"/>
+<g fill="#6CC4B5" clip-path="url(#land)"><path d="M11 19 20 14 28 18 29 24 23 28 21 37 15 36 10 30Z"/><path d="M27 40 34 34 42 37 43 45 38 54 32 54Z"/><path d="M36 13 45 16 51 24 44 30 36 25 39 19Z"/></g>
+<path d="M13 32h38M32 12c-9 11-9 29 0 40M32 12c9 11 9 29 0 40" fill="none" stroke="#C9F0E8" stroke-opacity=".4" stroke-width="1.5"/>
+<path id="trail" d="M12 44C4 24 18 8 34 8c17 0 28 12 25 28-2 11-12 19-24 20" fill="none" stroke="url(#warm)" stroke-width="5.5" stroke-linecap="round" pathLength="100"/>
+<g id="spark"><circle cx="32" cy="5" r="3.8" fill="#F9C77F"/></g>
 </svg>
