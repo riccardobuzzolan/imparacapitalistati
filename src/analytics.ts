@@ -58,8 +58,11 @@ export function startAnalytics(): void {
   try {
     const raw = localStorage.getItem(CONSENT_KEY);
     choice = parseConsent(raw, Date.now());
-    const saved = raw ? JSON.parse(raw) as Consent & { media?: boolean } : null;
-    if (choice !== null && typeof saved?.media === "boolean") mediaChoice = saved.media;
+    const saved = raw
+      ? (JSON.parse(raw) as Consent & { media?: boolean })
+      : null;
+    if (choice !== null && typeof saved?.media === "boolean")
+      mediaChoice = saved.media;
   } catch {
     // If storage is unavailable, ask again rather than assuming consent.
   }
@@ -105,12 +108,18 @@ export function startAnalytics(): void {
   const analyticsCheckbox = document.createElement("input");
   analyticsCheckbox.type = "checkbox";
   analyticsCheckbox.checked = choice === "granted";
-  analyticsOption.append(analyticsCheckbox, document.createTextNode(" Statistiche Google Analytics"));
+  analyticsOption.append(
+    analyticsCheckbox,
+    document.createTextNode(" Statistiche Google Analytics"),
+  );
   const mediaOption = document.createElement("label");
   const mediaCheckbox = document.createElement("input");
   mediaCheckbox.type = "checkbox";
   mediaCheckbox.checked = mediaChoice === true;
-  mediaOption.append(mediaCheckbox, document.createTextNode(" Anteprima interattiva esterna"));
+  mediaOption.append(
+    mediaCheckbox,
+    document.createTextNode(" Anteprima interattiva esterna"),
+  );
   choices.append(analyticsOption, mediaOption);
   const status = document.createElement("p");
   status.setAttribute("role", "status");
@@ -132,7 +141,10 @@ export function startAnalytics(): void {
     }
   };
   close.onclick = () => {
-    if (choice === null || mediaChoice === null) { choose("denied", false); return; }
+    if (choice === null || mediaChoice === null) {
+      choose("denied", false);
+      return;
+    }
     banner.hidden = true;
     settings.setAttribute("aria-expanded", "false");
     settings.focus();
@@ -196,7 +208,9 @@ export function startAnalytics(): void {
   }
 
   function applyMedia(): void {
-    const frame = document.querySelector<HTMLIFrameElement>("iframe[data-privacy-src]");
+    const frame = document.querySelector<HTMLIFrameElement>(
+      "iframe[data-privacy-src]",
+    );
     if (!frame) return;
     let placeholder = frame.nextElementSibling as HTMLElement | null;
     if (!placeholder?.classList.contains("analytics-media-placeholder")) {
@@ -212,7 +226,8 @@ export function startAnalytics(): void {
       frame.insertAdjacentElement("afterend", placeholder);
     }
     if (mediaChoice === true) {
-      if (!frame.hasAttribute("src")) frame.src = frame.dataset.privacySrc || "";
+      if (!frame.hasAttribute("src"))
+        frame.src = frame.dataset.privacySrc || "";
     } else frame.removeAttribute("src");
     frame.style.display = mediaChoice === true ? "" : "none";
     placeholder.hidden = mediaChoice === true;
@@ -224,7 +239,11 @@ export function startAnalytics(): void {
     try {
       localStorage.setItem(
         CONSENT_KEY,
-        JSON.stringify({ choice: next, media: nextMedia, expires: Date.now() + MAX_AGE }),
+        JSON.stringify({
+          choice: next,
+          media: nextMedia,
+          expires: Date.now() + MAX_AGE,
+        }),
       );
     } catch {
       // The choice still applies to this page when persistence is blocked.
@@ -234,7 +253,12 @@ export function startAnalytics(): void {
     applyMedia();
     if (next === "granted") enable();
     else if (started) {
-      win.gtag?.("consent", "update", { analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
+      win.gtag?.("consent", "update", {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+      });
       Object.assign(window, { [`ga-disable-${MEASUREMENT_ID}`]: true });
       for (const cookie of document.cookie.split(";")) {
         const name = cookie.trim().split("=")[0];
@@ -250,7 +274,11 @@ export function startAnalytics(): void {
   }
   reject.onclick = () => choose("denied", false);
   accept.onclick = () => choose("granted", true);
-  save.onclick = () => choose(analyticsCheckbox.checked ? "granted" : "denied", mediaCheckbox.checked);
+  save.onclick = () =>
+    choose(
+      analyticsCheckbox.checked ? "granted" : "denied",
+      mediaCheckbox.checked,
+    );
   document.addEventListener(
     "click",
     (event) => {
