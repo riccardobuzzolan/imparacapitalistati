@@ -54,56 +54,95 @@ export function startAnalytics(): void {
   if (!isProductionSite(url)) return;
   const win = window as AnalyticsWindow;
   let choice: Choice | null = null;
+  let mediaChoice: boolean | null = null;
   try {
-    choice = parseConsent(localStorage.getItem(CONSENT_KEY), Date.now());
+    const raw = localStorage.getItem(CONSENT_KEY);
+    choice = parseConsent(raw, Date.now());
+    const saved = raw ? JSON.parse(raw) as Consent & { media?: boolean } : null;
+    if (choice !== null && typeof saved?.media === "boolean") mediaChoice = saved.media;
   } catch {
     // If storage is unavailable, ask again rather than assuming consent.
   }
   let started = false;
   const banner = document.createElement("section");
   banner.className = "analytics-consent";
-  banner.setAttribute("aria-label", "Consenso alle statistiche");
+  banner.setAttribute("aria-label", "Preferenze privacy e cookie");
   const title = document.createElement("strong");
-  title.textContent = "Statistiche facoltative";
+  title.textContent = "La tua privacy, le tue scelte.";
   const text = document.createElement("p");
   text.textContent =
-    "Riccardo Buzzolan usa Google Analytics per capire quali pagine e funzioni del gioco vengono usate. Solo se accetti, Google riceve dati tecnici di navigazione e interazioni e può salvare cookie per 6 mesi. Non inviamo le risposte al quiz o i tuoi progressi. Le funzioni del gioco sono disponibili anche se rifiuti. Puoi cambiare scelta da Statistiche.";
+    "Puoi consentire le statistiche Google Analytics e l’anteprima esterna Memory Atlas. Dopo l’accettazione, i servizi selezionati si caricano automaticamente. Puoi rifiutare senza perdere le funzioni del gioco; risposte e progressi restano nel browser.";
   const privacy = document.createElement("a");
-  privacy.href = "https://policies.google.com/privacy?hl=it";
-  privacy.target = "_blank";
-  privacy.rel = "noopener noreferrer";
-  privacy.textContent = "Privacy di Google";
+  privacy.href = "./privacy.html";
+  privacy.textContent = "Privacy e cookie";
   const actions = document.createElement("div");
   actions.className = "analytics-consent-actions";
   const reject = document.createElement("button");
   reject.type = "button";
-  reject.textContent = "Rifiuta statistiche";
+  reject.textContent = "Rifiuta";
   const accept = document.createElement("button");
   accept.type = "button";
-  accept.textContent = "Accetta statistiche";
+  accept.textContent = "Accetta tutti";
   const close = document.createElement("button");
   close.type = "button";
-  close.textContent = "Mantieni la scelta";
+  close.textContent = "×";
+  close.className = "analytics-close";
+  close.setAttribute("aria-label", "Continua senza modificare le preferenze");
+  const customize = document.createElement("button");
+  customize.type = "button";
+  customize.textContent = "Personalizza";
+  customize.setAttribute("aria-expanded", "false");
+  const save = document.createElement("button");
+  save.type = "button";
+  save.textContent = "Salva preferenze";
+  save.className = "analytics-accept";
+  save.hidden = true;
+  accept.className = "analytics-accept";
+  const choices = document.createElement("div");
+  choices.className = "analytics-options";
+  choices.hidden = true;
+  const analyticsOption = document.createElement("label");
+  const analyticsCheckbox = document.createElement("input");
+  analyticsCheckbox.type = "checkbox";
+  analyticsCheckbox.checked = choice === "granted";
+  analyticsOption.append(analyticsCheckbox, document.createTextNode(" Statistiche Google Analytics"));
+  const mediaOption = document.createElement("label");
+  const mediaCheckbox = document.createElement("input");
+  mediaCheckbox.type = "checkbox";
+  mediaCheckbox.checked = mediaChoice === true;
+  mediaOption.append(mediaCheckbox, document.createTextNode(" Anteprima interattiva esterna"));
+  choices.append(analyticsOption, mediaOption);
   const status = document.createElement("p");
   status.setAttribute("role", "status");
-  actions.append(reject, accept, close);
-  banner.append(title, text, privacy, actions, status);
-  banner.hidden = choice !== null;
-  close.hidden = choice === null;
+  actions.append(reject, customize, accept, save);
+  banner.append(close, title, text, privacy, choices, actions, status);
+  banner.hidden = choice !== null && mediaChoice !== null;
   const settings = document.createElement("button");
   settings.type = "button";
   settings.className = "analytics-settings";
-  settings.textContent = "Statistiche";
+  settings.textContent = "Preferenze privacy";
   settings.setAttribute("aria-expanded", String(!banner.hidden));
   settings.onclick = () => {
     banner.hidden = !banner.hidden;
     settings.setAttribute("aria-expanded", String(!banner.hidden));
-    if (!banner.hidden) reject.focus();
+    if (!banner.hidden) {
+      analyticsCheckbox.checked = choice === "granted";
+      mediaCheckbox.checked = mediaChoice === true;
+      reject.focus();
+    }
   };
   close.onclick = () => {
+    if (choice === null || mediaChoice === null) { choose("denied", false); return; }
     banner.hidden = true;
     settings.setAttribute("aria-expanded", "false");
     settings.focus();
+  };
+  customize.onclick = () => {
+    choices.hidden = !choices.hidden;
+    customize.setAttribute("aria-expanded", String(!choices.hidden));
+    save.hidden = choices.hidden;
+    accept.hidden = !choices.hidden;
+    if (!choices.hidden) analyticsCheckbox.focus();
   };
   document.body.append(banner, settings);
 
@@ -156,21 +195,46 @@ export function startAnalytics(): void {
     send("page_view");
   }
 
-  function choose(next: Choice): void {
+  function applyMedia(): void {
+    const frame = document.querySelector<HTMLIFrameElement>("iframe[data-privacy-src]");
+    if (!frame) return;
+    let placeholder = frame.nextElementSibling as HTMLElement | null;
+    if (!placeholder?.classList.contains("analytics-media-placeholder")) {
+      placeholder = document.createElement("div");
+      placeholder.className = "analytics-media-placeholder";
+      const info = document.createElement("strong");
+      info.textContent = "Anteprima disponibile dopo il consenso";
+      const action = document.createElement("button");
+      action.type = "button";
+      action.textContent = "Gestisci preferenze";
+      action.addEventListener("click", () => settings.click());
+      placeholder.append(info, action);
+      frame.insertAdjacentElement("afterend", placeholder);
+    }
+    if (mediaChoice === true) {
+      if (!frame.hasAttribute("src")) frame.src = frame.dataset.privacySrc || "";
+    } else frame.removeAttribute("src");
+    frame.style.display = mediaChoice === true ? "" : "none";
+    placeholder.hidden = mediaChoice === true;
+  }
+
+  function choose(next: Choice, nextMedia: boolean): void {
     choice = next;
+    mediaChoice = nextMedia;
     try {
       localStorage.setItem(
         CONSENT_KEY,
-        JSON.stringify({ choice: next, expires: Date.now() + MAX_AGE }),
+        JSON.stringify({ choice: next, media: nextMedia, expires: Date.now() + MAX_AGE }),
       );
     } catch {
       // The choice still applies to this page when persistence is blocked.
     }
     banner.hidden = true;
-    close.hidden = false;
     settings.setAttribute("aria-expanded", "false");
+    applyMedia();
     if (next === "granted") enable();
     else if (started) {
+      win.gtag?.("consent", "update", { analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
       Object.assign(window, { [`ga-disable-${MEASUREMENT_ID}`]: true });
       for (const cookie of document.cookie.split(";")) {
         const name = cookie.trim().split("=")[0];
@@ -184,8 +248,9 @@ export function startAnalytics(): void {
     }
     settings.focus();
   }
-  reject.onclick = () => choose("denied");
-  accept.onclick = () => choose("granted");
+  reject.onclick = () => choose("denied", false);
+  accept.onclick = () => choose("granted", true);
+  save.onclick = () => choose(analyticsCheckbox.checked ? "granted" : "denied", mediaCheckbox.checked);
   document.addEventListener(
     "click",
     (event) => {
@@ -199,4 +264,5 @@ export function startAnalytics(): void {
     true,
   );
   if (choice === "granted") enable();
+  applyMedia();
 }
