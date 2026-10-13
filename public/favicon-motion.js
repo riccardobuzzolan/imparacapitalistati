@@ -40,9 +40,28 @@
 
     switch (mode) {
       case 'orbit': {
-        primary.setAttribute('transform', `rotate(${(360 * t).toFixed(2)} 32 32)`);
-        const lift = Math.sin(Math.PI * Math.min(1, t / .7)) ** 2 * -3;
-        transform('#pin', `translate(0 ${lift.toFixed(2)})`);
+        // Match the animated SVG's kinetic paint-on arc without rasterization.
+        const smooth = x => x * x * (3 - 2 * x);
+        const angle = t < .53
+          ? -64 + 86 * smooth(t / .53)
+          : t < .78 ? 22 : 22 + 274 * smooth((t - .78) / .22);
+        primary.setAttribute('transform', `rotate(${angle.toFixed(2)} 32 32)`);
+        const arc = svg.querySelector('#paint');
+        const progress = t < .08 ? 0 : t < .48
+          ? smooth((t - .08) / .40) : t < .80 ? 1 : 1 - (t - .80) / .20;
+        if (arc) {
+          arc.setAttribute('stroke-dasharray', '82 100');
+          arc.setAttribute('stroke-dashoffset', String(
+            (t < .80 ? 82 * (1 - progress) : -82 * (1 - progress)).toFixed(2)
+          ));
+          arc.setAttribute('opacity', String((.30 + .70 * progress).toFixed(2)));
+        }
+        const spark = svg.querySelector('#spark');
+        if (spark) {
+          const s = .72 + .28 * progress;
+          spark.setAttribute('transform', `translate(48 16) scale(${s.toFixed(3)}) translate(-48 -16)`);
+          spark.setAttribute('opacity', String((.15 + .85 * progress).toFixed(2)));
+        }
         break;
       }
       case 'check': {
