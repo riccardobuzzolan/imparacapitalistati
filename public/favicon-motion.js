@@ -30,7 +30,7 @@
 
   function applyFrame(svg, i) {
     const t = i / frameCount;
-    const primary = svg.querySelector('#motion');
+    const primary = svg.querySelector('#motion, #trail, #tick, #route, #page, #b');
     if (!primary) throw new Error('Animated SVG subject is missing');
     const p = reveal(t, .12, .55, .84);
     const transform = (id, value) => {
@@ -40,27 +40,12 @@
 
     switch (mode) {
       case 'orbit': {
-        // Match the animated SVG's kinetic paint-on arc without rasterization.
-        const smooth = x => x * x * (3 - 2 * x);
-        const angle = t < .53
-          ? -64 + 86 * smooth(t / .53)
-          : t < .78 ? 22 : 22 + 274 * smooth((t - .78) / .22);
-        primary.setAttribute('transform', `rotate(${angle.toFixed(2)} 32 32)`);
-        const arc = svg.querySelector('#paint');
-        const progress = t < .08 ? 0 : t < .48
-          ? smooth((t - .08) / .40) : t < .80 ? 1 : 1 - (t - .80) / .20;
-        if (arc) {
-          arc.setAttribute('stroke-dasharray', '82 100');
-          arc.setAttribute('stroke-dashoffset', String(
-            (t < .80 ? 82 * (1 - progress) : -82 * (1 - progress)).toFixed(2)
-          ));
-          arc.setAttribute('opacity', String((.30 + .70 * progress).toFixed(2)));
-        }
-        const spark = svg.querySelector('#spark');
-        if (spark) {
-          const s = .72 + .28 * progress;
-          spark.setAttribute('transform', `translate(48 16) scale(${s.toFixed(3)}) translate(-48 -16)`);
-          spark.setAttribute('opacity', String((.15 + .85 * progress).toFixed(2)));
+        primary.setAttribute('stroke-dasharray', '100');
+        primary.setAttribute('stroke-dashoffset', String((100*(1-p)).toFixed(2)));
+        const spark=svg.querySelector('#spark');
+        if(spark) {
+          spark.setAttribute('transform', 'rotate('+(-115+255*p).toFixed(2)+' 32 32)');
+          spark.setAttribute('opacity', String(p.toFixed(2)));
         }
         break;
       }
