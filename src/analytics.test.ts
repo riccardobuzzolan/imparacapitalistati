@@ -23,6 +23,10 @@ class FakeElement {
   setAttribute(): void {
     /* No-op DOM surface for consent transition tests. */
   }
+  hasAttribute(): boolean {
+    return false;
+  }
+  removeAttribute(): void {}
   focus(): void {
     /* No-op DOM surface. */
   }
@@ -54,9 +58,25 @@ function consentHarness(
     referrer: "https://example.com/search?q=private",
     cookie: "",
     createElement: (tag: string) => new FakeElement(tag),
+    createTextNode: (value: string) => {
+      const e = new FakeElement("#text");
+      e.textContent = value;
+      return e;
+    },
+    querySelector: () => null,
     addEventListener: vi.fn(),
   });
   return { body, head, storage, reload, win };
+}
+
+function findAction(root: FakeElement, label: string): FakeElement {
+  const nodes = [root];
+  while (nodes.length) {
+    const node = nodes.shift()!;
+    if (node.tag === "button" && node.textContent === label) return node;
+    nodes.push(...node.children);
+  }
+  throw new Error("Missing consent button: " + label);
 }
 
 describe("Consent transitions", () => {
@@ -65,16 +85,16 @@ describe("Consent transitions", () => {
     startAnalytics();
     expect(h.head.children).toHaveLength(0);
     expect(h.win.dataLayer).toBeUndefined();
-    h.body.children[0].children[3].children[0].onclick?.();
+    findAction(h.body, "Rifiuta").onclick?.();
     expect(h.head.children).toHaveLength(0);
     expect([...h.storage.values()][0]).toContain('"denied"');
   });
   it("loads once on approval and disables and reloads on withdrawal", () => {
     const h = consentHarness();
     startAnalytics();
-    const buttons = h.body.children[0].children[3].children;
-    buttons[1].onclick?.();
-    buttons[1].onclick?.();
+    const accept = findAction(h.body, "Accetta tutti");
+    accept.onclick?.();
+    accept.onclick?.();
     expect(h.head.children).toHaveLength(1);
     expect(h.head.children[0].src).toContain("G-30SFB80YPY");
     const calls = h.win.dataLayer?.map((x) => Array.from(x)) || [];
@@ -92,7 +112,7 @@ describe("Consent transitions", () => {
       calls.filter((x) => x[0] === "event" && x[1] === "page_view"),
     ).toHaveLength(1);
     expect(JSON.stringify(calls)).not.toContain("private");
-    buttons[0].onclick?.();
+    findAction(h.body, "Rifiuta").onclick?.();
     expect(h.win).toHaveProperty("ga-disable-G-30SFB80YPY", true);
     expect(h.reload).toHaveBeenCalledOnce();
     expect([...h.storage.values()][0]).toContain('"denied"');
