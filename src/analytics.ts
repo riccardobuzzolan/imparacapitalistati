@@ -2,7 +2,7 @@ import "./styles/analytics.css";
 
 const MEASUREMENT_ID = "G-30SFB80YPY";
 const CONSENT_KEY = "memory-atlas-analytics-consent-v1";
-const MAX_AGE = 180 * 24 * 60 * 60 * 1000;
+const MAX_AGE = 185 * 24 * 60 * 60 * 1000;
 type Choice = "granted" | "denied";
 type Consent = { choice: Choice; expires: number };
 type Gtag = (...args: unknown[]) => void;
