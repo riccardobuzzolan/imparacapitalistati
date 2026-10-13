@@ -2,5 +2,5 @@
 #n{animation:north 3.6s cubic-bezier(.22,.75,.24,1) infinite}#s{animation:south 3.6s cubic-bezier(.22,.75,.24,1) infinite}#e{animation:east 3.6s cubic-bezier(.22,.75,.24,1) infinite}#w{animation:west 3.6s cubic-bezier(.22,.75,.24,1) infinite}#heart{transform-origin:32px 32px;animation:heartbeat 3.6s cubic-bezier(.22,.75,.24,1) infinite}
 @keyframes north{0%,10%,100%{transform:translateY(-9px)}42%,78%{transform:translateY(0)}}@keyframes south{0%,10%,100%{transform:translateY(9px)}42%,78%{transform:translateY(0)}}@keyframes east{0%,10%,100%{transform:translateX(9px)}42%,78%{transform:translateX(0)}}@keyframes west{0%,10%,100%{transform:translateX(-9px)}42%,78%{transform:translateX(0)}}@keyframes heartbeat{0%,24%,100%{transform:scale(.25);opacity:0}46%,78%{transform:scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){#n,#s,#e,#w,#heart{animation:none}#heart{opacity:1;transform:scale(1)}}</style>
-<rect x="0" y="0" width="64" height="64" rx="10" fill="#FFFFFF"/>
+
 <g id="n"><path d="M32 6 41 26 32 31 23 26Z" fill="#FF643D"/></g><g id="e"><path d="M58 32 38 41 33 32 38 23Z" fill="#0978F8"/></g><g id="s"><path d="M32 58 23 38 32 33 41 38Z" fill="#05CFA5"/></g><g id="w"><path d="M6 32 26 23 31 32 26 41Z" fill="#293BBF"/></g><g id="heart"><rect x="28" y="28" width="8" height="8" rx="1.5" fill="#FFD139" transform="rotate(45 32 32)"/></g></svg>
