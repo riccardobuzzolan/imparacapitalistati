@@ -131,6 +131,7 @@ export function startAnalytics(): void {
   settings.className = "analytics-settings";
   settings.textContent = "Preferenze privacy";
   settings.setAttribute("aria-expanded", String(!banner.hidden));
+  document.getElementById("footerPrivacySettings")?.addEventListener("click", () => settings.click());
   settings.onclick = () => {
     banner.hidden = !banner.hidden;
     settings.setAttribute("aria-expanded", String(!banner.hidden));
