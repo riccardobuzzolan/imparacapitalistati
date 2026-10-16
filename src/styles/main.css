@@ -768,3 +768,6 @@ main {
   outline: 3px solid #8dc7ac;
   outline-offset: 3px;
 }
+
+/* Isolated light footer: leaves original opening screens unchanged. */
+.site-footer-light{background:#fff;color:#1a2922;border-top:1px solid #e3ebe5;margin:24px 0 0;padding:36px max(20px,calc((100% - 1100px)/2)) 24px;font-family:inherit}.site-footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}.site-footer-inner>div,.site-footer-inner nav{display:flex;flex-direction:column;align-items:flex-start;gap:9px}.site-footer-inner strong{font-size:16px}.site-footer-inner b{font-size:12px}.site-footer-inner p{color:#53685b;font-size:12px;line-height:1.6;max-width:32ch;margin:0}.site-footer-inner a,.site-footer-inner button{font:inherit;font-size:12px;color:#315d48;text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}.site-footer-meta{border-top:1px solid #e3ebe5;margin:28px 0 0;padding-top:15px;color:#586c60;font-size:11px}.site-footer-light :is(a,button):focus-visible{outline:3px solid #8bcbae;outline-offset:3px}@media(max-width:650px){.site-footer-inner{grid-template-columns:1fr 1fr}.site-footer-about{grid-column:1/-1}.site-footer-light{padding:28px 20px}}html,body{color-scheme:light}
