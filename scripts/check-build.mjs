@@ -58,6 +58,13 @@ assert.ok(
   !/NavigationRoute|createHandlerBoundToURL/.test(worker),
   "Unknown routes must not become cached home pages",
 );
+const privacy = readFileSync(resolve(root, "privacy.html"), "utf8");
+assert.match(privacy, /<title>Privacy e cookie/);
+assert.match(privacy, /noindex/);
+assert.ok(
+  html.includes('href="./privacy.html"'),
+  "Homepage must link to the published privacy page",
+);
 assert.match(readFileSync(resolve(root, "404.html"), "utf8"), /noindex/);
 assert.match(
   readFileSync(resolve(root, "robots.txt"), "utf8"),
