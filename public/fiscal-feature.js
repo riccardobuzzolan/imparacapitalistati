@@ -2,6 +2,7 @@ const root = document.getElementById("fiscal-feature-root");
 
 if (root) {
   const style = document.createElement("style");
+  // prettier-ignore
   style.textContent = `.fiscal-feature{max-width:1200px;margin:34px auto 64px;padding:clamp(18px,4vw,44px);background:#f8fafc;border:1px solid #e4e8ee;border-radius:26px;color:#182333;font-family:system-ui,-apple-system,Segoe UI,sans-serif;box-sizing:border-box}
 .fiscal-feature *{box-sizing:border-box}.fiscal-feature-grid{display:grid;grid-template-columns:minmax(220px,.74fr) minmax(0,1.26fr);gap:clamp(18px,3vw,38px);align-items:center}
 .fiscal-feature-copy small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#53667d;font-weight:700}.fiscal-feature-copy h2{font-size:clamp(28px,3vw,44px);line-height:1.1;letter-spacing:-.04em;margin:14px 0;color:#172437}
@@ -13,5 +14,6 @@ if (root) {
 .fiscal-feature iframe{display:block;width:100%;height:440px;border:0;background:#fff}
 @media(max-width:760px){.fiscal-feature{margin:24px 14px 44px;padding:22px}.fiscal-feature-grid{grid-template-columns:1fr}.fiscal-feature iframe{height:450px}}`;
   root.append(style);
+  // prettier-ignore
   root.insertAdjacentHTML("beforeend", `<section id="progetto-scadenze-fiscali" class="fiscal-feature" aria-labelledby="fiscal-feature-title"><div class="fiscal-feature-grid"><div class="fiscal-feature-copy"><small>Progetto web gestito da me</small><h2 id="fiscal-feature-title">Scadenze Fiscali</h2><p>Un sito dedicato alla consultazione delle scadenze fiscali italiane, con calendario e contenuti di approfondimento. Puoi esplorarlo direttamente nell'anteprima.</p><a href="https://scadenze-fiscali.vercel.app/" target="_blank" rel="noopener noreferrer">Apri sito ↗</a></div><div class="fiscal-feature-preview"><div class="fiscal-feature-chrome"><span class="fiscal-feature-dot"></span><span class="fiscal-feature-dot"></span><span class="fiscal-feature-dot"></span><span class="fiscal-feature-domain">scadenze-fiscali.vercel.app</span></div><iframe title="Anteprima interattiva del progetto Scadenze Fiscali" src="https://scadenze-fiscali.vercel.app/" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen"></iframe></div></div></section>`);
 }
