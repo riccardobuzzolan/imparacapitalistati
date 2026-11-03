@@ -1,0 +1,38 @@
+name: Preview mobile map zoom
+on:
+  pull_request:
+    paths:
+      - .github/workflows/mobile-map-preview.yml
+permissions:
+  contents: write
+jobs:
+  capture:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Build app and serve preview
+        run: |
+          VERCEL=1 npm run build
+          npm run preview -- --host 127.0.0.1 > /tmp/vite-preview.log 2>&1 &
+          sleep 3
+      - name: Capture map at phone width
+        run: node .github/scripts/mobile-map-preview.cjs
+      - name: Save preview screenshot to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/images/mobile-map-zoom.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Verifica visiva mappa mobile"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
