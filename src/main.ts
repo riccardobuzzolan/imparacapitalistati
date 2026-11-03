@@ -183,6 +183,10 @@ async function setRegion(
       b.classList.toggle("active", b.dataset.region === regionId),
     );
   replaceMap(mapWrap, region().map);
+  mapWrap.tabIndex = 0;
+  mapWrap.setAttribute("role", "region");
+  mapWrap.setAttribute("aria-label", "Mappa geografica scorrevole");
+  mapWrap.scrollLeft = 0;
   bindMap();
   paintMap();
   updateToolbar();
@@ -211,8 +215,11 @@ function updateToolbar(): void {
   $("progressTotal").textContent = "/ " + total;
   $("quickBtn").classList.toggle("active", quickMode);
   $("quickBtn").textContent = quickMode ? "Ferma quiz" : "Quiz rapido";
-  $("mapHint").textContent =
-    "Tocca " + (r.kind === "stato" ? "uno stato" : "un Paese");
+  const itemHint = r.kind === "stato" ? "uno stato" : "un Paese";
+  const mobileHint = window.matchMedia("(max-width: 520px)").matches;
+  $("mapHint").textContent = mobileHint
+    ? `Scorri la mappa · Tocca ${itemHint}`
+    : `Tocca ${itemHint}`;
 }
 function bindMap(): void {
   mapWrap.querySelectorAll<HTMLElement>(".state-path").forEach((el) => {
