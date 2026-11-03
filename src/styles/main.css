@@ -768,3 +768,24 @@ main {
   outline: 3px solid #8dc7ac;
   outline-offset: 3px;
 }
+
+/* Su telefoni stretti la mappa mantiene una dimensione utile al tocco.
+   Si può scorrere orizzontalmente senza alterare la geometria SVG. */
+@media (max-width: 520px) {
+  .map-wrap {
+    display: block;
+    height: clamp(350px, 58svh, 510px);
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .map-wrap svg {
+    width: 620px;
+    min-width: 620px;
+    max-width: none;
+    height: auto;
+    max-height: none;
+  }
+}
