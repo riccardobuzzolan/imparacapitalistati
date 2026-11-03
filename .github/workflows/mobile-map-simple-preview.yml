@@ -28,7 +28,7 @@ jobs:
       - name: Capture narrow viewport
         run: |
           mkdir -p docs/images
-          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=7000 --window-size=390,844 --screenshot=docs/images/map-mobile-test.png "http://127.0.0.1:4173/#usa/map"
+          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=7000 --window-size=390,844 --screenshot=docs/images/map-mobile-test.png "http://127.0.0.1:4173/"
           test -s docs/images/map-mobile-test.png
       - name: Store screenshot in PR
         run: |
