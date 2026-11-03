@@ -1,32 +1,17 @@
-# Memory Atlas
+# Memory Atlas · quiz capitali
 
-Un quiz per esercitarsi con le capitali degli Stati Uniti, dell'Europa e del Sud America.
+Un quiz per esercitarsi sulle capitali degli Stati Uniti, dell’Europa e del Sud America. Ho voluto mantenere i progressi sul dispositivo, con la possibilità di esportarli e importarli.
 
-**Gioca online:** https://riccardobuzzolan.github.io/imparacapitalistati/
-
-È disponibile anche una [versione su Vercel](https://imparacapitalistati.vercel.app/).
+**Apri il progetto:** https://riccardobuzzolan.github.io/imparacapitalistati/
 
 ## Come funziona
 
-Si può scegliere un'area geografica e mettere alla prova le proprie conoscenze. I progressi restano salvati nel browser e possono essere esportati o importati tramite file JSON.
+![Schema del flusso principale](docs/images/flusso.svg)
 
-L'app può essere installata come PWA. Dopo un primo caricamento completo, le risorse locali consentono di giocare anche offline.
+Il progetto separa dati geografici, sessione di gioco e interfaccia. Dopo un primo caricamento completo, le risorse locali permettono di usare l'app anche offline.
 
-## Tecnologie
+## Tecnologie e struttura
 
-Il progetto usa TypeScript, Vite e test automatizzati. Il codice è organizzato in cartelle per dati geografici, logica del gioco, componenti e stili.
+Per eseguirlo: `npm ci`, `npm run dev`. Per i controlli: `npm run check`.
 
-Per avviarlo in locale:
-
-```bash
-npm ci
-npm run dev
-```
-
-Per eseguire i controlli:
-
-```bash
-npm run check
-```
-
-Configurazioni di pubblicazione, gestione dei progressi e istruzioni di recupero sono in [docs/TECHNICAL.md](docs/TECHNICAL.md).
+Le informazioni su distribuzione, accessibilità, gestione dati e ripristino sono conservate nella [documentazione tecnica](docs/TECHNICAL.md).
