@@ -25,10 +25,33 @@ jobs:
           VERCEL=1 npm run build
           VERCEL=1 npm run preview -- --host 127.0.0.1 > /tmp/map-preview.log 2>&1 &
           sleep 3
+      - name: Prepare diagnostic build without changing the source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("dist/index.html")
+          html = p.read_text(encoding="utf-8")
+          script = """<script>
+          setInterval(() => {
+            window.scrollTo(0, 0);
+            const wrap = document.getElementById('mapWrap');
+            const svg = wrap?.querySelector('svg');
+            const width = svg?.getBoundingClientRect().width ?? 0;
+            document.documentElement.dataset.mapTest =
+              width >= 600 && wrap.scrollWidth > wrap.clientWidth ? 'pass' : 'fail';
+          }, 100);
+          </script>"""
+          assert "</body>" in html
+          p.write_text(html.replace("</body>", script + "</body>"), encoding="utf-8")
+          PY
+      - name: Confirm actual zoom and horizontal scroll
+        run: |
+          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=3500 --window-size=390,844 --dump-dom "http://127.0.0.1:4173/" > /tmp/mobile-dom.html
+          grep -q 'data-map-test="pass"' /tmp/mobile-dom.html
       - name: Capture narrow viewport
         run: |
           mkdir -p docs/images
-          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=1500 --window-size=390,844 --screenshot=docs/images/map-mobile-test.png "http://127.0.0.1:4173/"
+          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=3500 --window-size=390,844 --screenshot=docs/images/map-mobile-test.png "http://127.0.0.1:4173/"
           test -s docs/images/map-mobile-test.png
       - name: Store screenshot in PR
         run: |
