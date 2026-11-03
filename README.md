@@ -4,6 +4,10 @@ Un quiz per esercitarsi sulle capitali degli Stati Uniti, dell’Europa e del Su
 
 **Apri il progetto:** https://riccardobuzzolan.github.io/imparacapitalistati/
 
+## Screenshot del sito
+
+![Schermata desktop reale del sito pubblicato](docs/images/screenshot-desktop.png)
+
 ## Come funziona
 
 ![Schema del flusso principale](docs/images/flusso.svg)
