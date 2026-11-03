@@ -215,9 +215,11 @@ function updateToolbar(): void {
   $("progressTotal").textContent = "/ " + total;
   $("quickBtn").classList.toggle("active", quickMode);
   $("quickBtn").textContent = quickMode ? "Ferma quiz" : "Quiz rapido";
-  $("mapHint").textContent =
-    (window.matchMedia("(max-width: 520px)").matches ? "Scorri la mappa · " : "") +
-    "Tocca " + (r.kind === "stato" ? "uno stato" : "un Paese");
+  const itemHint = r.kind === "stato" ? "uno stato" : "un Paese";
+  const mobileHint = window.matchMedia("(max-width: 520px)").matches;
+  $("mapHint").textContent = mobileHint
+    ? `Scorri la mappa · Tocca ${itemHint}`
+    : `Tocca ${itemHint}`;
 }
 function bindMap(): void {
   mapWrap.querySelectorAll<HTMLElement>(".state-path").forEach((el) => {
