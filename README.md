@@ -8,6 +8,13 @@ Un quiz per esercitarsi sulle capitali degli Stati Uniti, dell’Europa e del Su
 
 ![Schermata desktop reale del sito pubblicato](docs/images/screenshot-desktop.png)
 
+<details>
+<summary>Screenshot mobile</summary>
+
+![Schermata mobile del sito](docs/images/screenshot-mobile.png)
+
+</details>
+
 ## Come funziona
 
 ![Schema del flusso principale](docs/images/flusso.svg)
